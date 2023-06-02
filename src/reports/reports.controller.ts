@@ -25,7 +25,11 @@ export class ReportsController {
   ) {
     const report = await this.reportsService.createReport(createTicketData);
     if (report) {
-      res.status(HttpStatus.CREATED).json(report);
+      if (!report.Error && !!report.error) {
+        res.status(HttpStatus.CREATED).json(report);
+      } else {
+        res.status(HttpStatus.BAD_REQUEST).json(report);
+      }
     } else {
       res
         .status(HttpStatus.SERVICE_UNAVAILABLE)
