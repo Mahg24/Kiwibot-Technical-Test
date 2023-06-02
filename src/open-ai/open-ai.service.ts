@@ -13,10 +13,12 @@ export class OpenAiService {
 
   async dataExtraction(problem: string) {
     const openai = new OpenAIApi(this.configuration);
-    const prompt = `give me only answers in JSON format.Identify the problem following this criteria: problem_location, problem_type (hardware, software, field), then do a summary of the problem in english, if the properties can't be identified return in a JSON format an error saying "i don't understand you, can you be more specific please" this is the message:"${problem}"`;
+    const prompt = `${this.configService.get<string>(
+      'openai_prompt',
+    )}"${problem}"`;
     try {
       const completion = await openai.createCompletion({
-        model: 'text-davinci-003',
+        model: this.configService.get<string>('openai_model'),
         prompt,
         temperature: 0.7,
         max_tokens: 170,
