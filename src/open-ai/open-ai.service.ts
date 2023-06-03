@@ -4,7 +4,7 @@ import { error, log } from 'console';
 const { Configuration, OpenAIApi } = require('openai');
 @Injectable()
 export class OpenAiService {
-  configuration;
+  private configuration;
   constructor(private configService: ConfigService) {
     this.configuration = new Configuration({
       apiKey: configService.get<string>('openai_api_key'),
@@ -12,10 +12,35 @@ export class OpenAiService {
   }
 
   async dataExtraction(problem: string) {
-    const openai = new OpenAIApi(this.configuration);
     const prompt = `${this.configService.get<string>(
-      'openai_prompt',
+      'openai_prompt_data_extraction',
     )}"${problem}"`;
+    const result = await this.createCompletion(prompt);
+    if (result) {
+      return result;
+    } else {
+      return {
+        error: 'AI error please try again',
+      };
+    }
+  }
+
+  async problemAnalysis(data: any) {
+    const prompt = `${this.configService.get<string>(
+      'openai_prompt_analysis',
+    )}"${data}"`;
+    const result = await this.createCompletion(prompt);
+    if (result) {
+      return result;
+    } else {
+      return {
+        error: 'AI error please try again',
+      };
+    }
+  }
+
+  private async createCompletion(prompt) {
+    const openai = new OpenAIApi(this.configuration);
     try {
       const completion = await openai.createCompletion({
         model: this.configService.get<string>('openai_model'),

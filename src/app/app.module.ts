@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import configuration from 'src/config/configuration';
 import { ReportsModule } from 'src/reports/reports.module';
+import { TicketsModule } from 'src/tickets/tickets.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -11,6 +12,7 @@ import { ReportsModule } from 'src/reports/reports.module';
     }),
     MongooseModule.forRoot(process.env.MONGO_URI),
     ReportsModule,
+    TicketsModule,
   ],
   controllers: [],
   providers: [],

@@ -9,10 +9,9 @@ import {
   Param,
   Get,
 } from '@nestjs/common';
-import { CreateTicketDto, UpdateTicketDto } from './interfaces/report.dto';
+import { CreateReportDto } from './interfaces/report.dto';
 import { ReportsService } from './reports.service';
-import { Response, query } from 'express';
-import { error, log } from 'console';
+import { Response } from 'express';
 
 @Controller('reports')
 export class ReportsController {
@@ -21,11 +20,11 @@ export class ReportsController {
   @Post()
   async createTicket(
     @Res() res: Response,
-    @Body() createTicketData: CreateTicketDto,
+    @Body() createTicketData: CreateReportDto,
   ) {
     const report = await this.reportsService.createReport(createTicketData);
     if (report) {
-      if (!report.Error && !!report.error) {
+      if (!report.Error && !report.error) {
         res.status(HttpStatus.CREATED).json(report);
       } else {
         res.status(HttpStatus.BAD_REQUEST).json(report);
@@ -64,27 +63,10 @@ export class ReportsController {
   }
 
   @Get('ticket/:id')
-  async getOnebyticket_idReports(
-    @Res() res: Response,
-    @Param('id') id: string,
-  ) {
+  async getOnebyticket_id(@Res() res: Response, @Param('id') id: string) {
     const report = await this.reportsService.getOneReport({
       ticket_id: id,
     });
-    if (report) {
-      res.status(HttpStatus.OK).json(report);
-    } else {
-      res.status(HttpStatus.NOT_FOUND).json({ error: 'Report not found' });
-    }
-  }
-
-  @Put(':id')
-  async updateTicket(
-    @Res() res: Response,
-    @Body() updateReportData: UpdateTicketDto,
-    @Param('id') id: string,
-  ) {
-    const report = await this.reportsService.updateReport(id, updateReportData);
     if (report) {
       res.status(HttpStatus.OK).json(report);
     } else {
