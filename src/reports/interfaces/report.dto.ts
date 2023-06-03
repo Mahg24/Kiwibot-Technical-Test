@@ -1,19 +1,11 @@
-import { IsAlphanumeric, IsNotEmpty, IsString, IsIn } from 'class-validator';
+import { IsAlphanumeric, IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateTicketDto {
-  @IsNotEmpty()
-  @IsAlphanumeric()
-  bot_id: string;
-
+export class CreateReportDto {
   @IsNotEmpty()
   @IsString()
   message: string;
-}
 
-const status = ['open', 'in progress', 'closed'] as const;
-export class UpdateTicketDto {
   @IsNotEmpty()
   @IsString()
-  @IsIn(status)
-  status: string;
+  username: string;
 }

@@ -1,24 +1,20 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-
+import * as mongoose from 'mongoose';
 export type ReportDocument = HydratedDocument<Report>;
 
 @Schema({ timestamps: true })
 export class Report {
-  @Prop({
-    unique: true,
-  })
-  ticket_id: string;
   @Prop()
-  problem_location: string;
+  username: string;
   @Prop()
-  problem_type: string;
-  @Prop()
-  summary: string;
+  message: string;
   @Prop()
   bot_id: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'tickets' })
+  ticket: string;
   @Prop()
-  status: string;
+  botHeartbeat: mongoose.Schema.Types.Mixed;
 }
 
 export const ReportSchema = SchemaFactory.createForClass(Report);
