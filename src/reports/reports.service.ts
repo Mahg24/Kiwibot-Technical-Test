@@ -48,7 +48,7 @@ export class ReportsService {
         const response = await firstValueFrom(
           botResponses$.pipe(
             filter((response) => response.ticket_id === ticket.ticket_id),
-            // timeout(10000),
+            timeout(10000),
             catchError(() => of(null)),
             first(),
           ),
