@@ -6,10 +6,14 @@ import { CreateTicketDto, UpdateTicketDto } from './interfaces/ticket.dto';
 import { randomUUID } from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import { OpenAiService } from 'src/open-ai/open-ai.service';
+import { TicketsGateway } from './tickets.gateway';
 
 @Injectable()
 export class TicketsService {
-  constructor(@InjectModel(Ticket.name) private ticketModel: Model<Ticket>) {}
+  constructor(
+    @InjectModel(Ticket.name) private ticketModel: Model<Ticket>,
+    private ticketsGateway: TicketsGateway,
+  ) {}
 
   /**
    * This function creates a new ticket with the provided data and saves it to the database.
@@ -34,26 +38,27 @@ export class TicketsService {
   }
 
   /**
-   * This is an async function that updates the status of a ticket in a MongoDB database and returns the
-   * updated ticket.
+   * This is an async function that updates the status of a ticket and returns the updated ticket if
+   * successful, otherwise it returns null.
    * @param {string} id - A string representing the ID of the ticket to be updated.
-   * @param {UpdateTicketDto} reportStatus - UpdateTicketDto is likely a data transfer object (DTO) that
-   * contains information about the updated status of a ticket. It could include properties such as the
-   * new status value, the user who updated the ticket, and any additional notes or comments. The
-   * `reportStatus` parameter in the `updateTicket`
-   * @returns either the updated ticket object if it exists, or null if it does not exist.
+   * @param {UpdateTicketDto} ticketStatus - UpdateTicketDto is likely a custom data transfer object
+   * (DTO) that contains information about the updated status of a ticket. It probably has at least one
+   * property called "status" that indicates the new status of the ticket.
+   * @returns The `updateTicket` function returns either the updated ticket object or `null` if the
+   * ticket was not found.
    */
-  async updateTicket(id: string, reportStatus: UpdateTicketDto) {
+  async updateTicket(id: string, ticketStatus: UpdateTicketDto) {
     const ticket = await this.ticketModel.findOneAndUpdate(
       { _id: id },
       {
         $set: {
-          status: reportStatus.status,
+          status: ticketStatus.status,
         },
       },
       { new: true },
     );
     if (ticket) {
+      this.ticketsGateway.ticketStatusChange(id, ticketStatus.status);
       return ticket;
     } else {
       return null;
